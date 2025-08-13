@@ -1,0 +1,32 @@
+{
+  "id": "evt_002",
+  "type": "Training.ContractSigned",
+  "timestamp": "2024-01-13T15:00:00.000Z",
+  "source": "cloudsign",
+  "payload": {
+    "programId": "prog_001",
+    "program": {
+      "id": "prog_001",
+      "companyName": "株式会社テストカンパニー",
+      "programName": "営業力強化研修",
+      "startDate": "2024-02-01T00:00:00.000Z",
+      "endDate": "2024-03-31T00:00:00.000Z",
+      "sessionCount": 8,
+      "status": "scheduled",
+      "participants": [
+        {
+          "id": "part_001",
+          "name": "山田太郎",
+          "email": "yamada@test-company.co.jp",
+          "role": "営業部長"
+        },
+        {
+          "id": "part_002",
+          "name": "佐藤花子",
+          "email": "sato@test-company.co.jp",
+          "role": "営業担当"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "name": "dandori-work-ai-agent",
+  "version": "1.0.0-mvp",
+  "description": "Dandori Work AI Agent System for Sales and Training",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "test:unit": "vitest run --dir tests/unit",
+    "test:e2e": "vitest run --dir tests/e2e",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "vercel-build": "npm run build"
+  },
+  "keywords": [
+    "ai-agent",
+    "sales",
+    "training",
+    "automation"
+  ],
+  "author": "Dandori Work Development Team",
+  "license": "PRIVATE",
+  "dependencies": {
+    "@types/node": "^20.11.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "handlebars": "^4.7.8",
+    "js-yaml": "^4.1.0",
+    "node-cron": "^3.0.3",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node-cron": "^3.0.11",
+    "@types/uuid": "^9.0.7",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.4",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

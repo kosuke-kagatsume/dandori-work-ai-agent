@@ -1,0 +1,44 @@
+# Sales Agent Configuration
+businessHours:
+  start: 9
+  end: 18
+
+defaultBcc: sales@dandori-work.com
+
+smsUrlRestriction: true
+
+attachmentNaming:
+  prefix: "【DW提案書】"
+  format: "{companyName}_{YYYYMMDD}"
+
+quietHours:
+  email:
+    startHour: 20
+    endHour: 8
+    timezone: "Asia/Tokyo"
+  sms:
+    startHour: 21
+    endHour: 8
+    timezone: "Asia/Tokyo"
+
+warningThresholds:
+  discountPercentage: 15
+
+territoryAssignment:
+  - code: "tokyo"
+    name: "東京"
+    assignedTo: "sales_001"
+    prefectures: ["東京都"]
+  - code: "osaka"
+    name: "大阪"
+    assignedTo: "sales_002"
+    prefectures: ["大阪府"]
+  - code: "nagoya"
+    name: "名古屋"
+    assignedTo: "sales_003"
+    prefectures: ["愛知県"]
+
+normalizationDictionary:
+  "株式会社": "㈱"
+  "有限会社": "㈲"
+  "合同会社": "(同)"

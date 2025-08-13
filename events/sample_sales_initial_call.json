@@ -1,0 +1,13 @@
+{
+  "id": "evt_001",
+  "type": "Sales.InitialCallLogged",
+  "timestamp": "2024-01-13T10:30:00.000Z",
+  "source": "zoho_crm",
+  "payload": {
+    "dealId": "deal_001",
+    "callDuration": 300,
+    "callOutcome": "interested",
+    "nextAction": "send_proposal",
+    "notes": "Customer interested in our automation solutions"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "version": 2,
+  "name": "dandori-work-ai-agent",
+  "builds": [
+    {
+      "src": "src/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/health",
+      "dest": "/src/index.ts"
+    },
+    {
+      "src": "/webhook",
+      "dest": "/src/index.ts"
+    },
+    {
+      "src": "/events",
+      "dest": "/src/index.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/src/index.ts"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "LOG_LEVEL": "@log_level",
+    "ZOHO_API_KEY": "@zoho_api_key",
+    "GMAIL_CLIENT_ID": "@gmail_client_id",
+    "GMAIL_CLIENT_SECRET": "@gmail_client_secret",
+    "CHATWORK_API_TOKEN": "@chatwork_api_token",
+    "CLOUDSIGN_API_KEY": "@cloudsign_api_key",
+    "GMO_SIGN_API_KEY": "@gmo_sign_api_key"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  },
+  "functions": {
+    "src/index.ts": {
+      "maxDuration": 30
+    }
+  }
+}

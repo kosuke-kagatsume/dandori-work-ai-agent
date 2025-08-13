@@ -1,0 +1,35 @@
+# Training Agent Configuration
+sessionHours:
+  start: 10
+  end: 18
+
+# 1=Monday, 2=Tuesday, ..., 6=Saturday, 7=Sunday
+allowedDays: [1, 2, 3, 4, 5, 6]  # Monday to Saturday
+
+defaultBcc: training@dandori-work.com
+
+reminders:
+  t3Days: 3  # 3 days before
+  t1Days: 1  # 1 day before
+
+recordingRetention: 12  # months
+
+quietHours:
+  email:
+    startHour: 20
+    endHour: 8
+    timezone: "Asia/Tokyo"
+  chatwork:
+    startHour: 20
+    endHour: 8
+    timezone: "Asia/Tokyo"
+
+sessionDefaults:
+  duration: 7  # hours
+  breakTime: 1  # hour
+  maxParticipants: 30
+  minParticipants: 5
+
+materials:
+  baseUrl: "https://materials.dandori-work.com"
+  formats: ["pdf", "pptx", "xlsx"]
