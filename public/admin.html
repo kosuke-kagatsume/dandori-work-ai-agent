@@ -37,6 +37,7 @@
             margin-bottom: 30px;
             color: #333;
             text-align: center;
+            font-size: 24px;
         }
         
         .form-group {
@@ -56,6 +57,12 @@
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
         }
         
         .btn {
@@ -182,17 +189,6 @@
             color: #721c24;
         }
         
-        .api-key-box {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 6px;
-            margin: 10px 0;
-            font-family: monospace;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
         .tabs {
             display: flex;
             gap: 20px;
@@ -216,7 +212,33 @@
         .error-message {
             color: #dc3545;
             margin-top: 10px;
+            padding: 10px;
+            background: #f8d7da;
+            border-radius: 4px;
             display: none;
+        }
+        
+        .success-message {
+            color: #155724;
+            margin-top: 10px;
+            padding: 10px;
+            background: #d4edda;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .demo-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .demo-info strong {
+            color: #333;
         }
     </style>
 </head>
@@ -227,11 +249,21 @@
             <h2>🔐 管理画面ログイン</h2>
             <form id="loginForm">
                 <div class="form-group">
-                    <label>APIキー</label>
-                    <input type="password" id="apiKey" placeholder="dw_live_key_..." required>
+                    <label>ユーザーID</label>
+                    <input type="text" id="username" placeholder="admin" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label>パスワード</label>
+                    <input type="password" id="password" placeholder="パスワードを入力" required autocomplete="current-password">
                 </div>
                 <button type="submit" class="btn">ログイン</button>
                 <div class="error-message" id="loginError"></div>
+                
+                <div class="demo-info">
+                    <strong>デモアカウント</strong><br>
+                    ID: admin<br>
+                    パスワード: dandori123
+                </div>
             </form>
         </div>
     </div>
@@ -241,7 +273,10 @@
         <header class="header">
             <div class="header-content">
                 <h1>📊 Dandori Work 管理画面</h1>
-                <button class="btn" style="width: auto; padding: 8px 20px;" onclick="logout()">ログアウト</button>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <span id="currentUser">admin</span>
+                    <button class="btn" style="width: auto; padding: 8px 20px;" onclick="logout()">ログアウト</button>
+                </div>
             </div>
         </header>
         
@@ -270,9 +305,9 @@
             <div class="section">
                 <div class="tabs">
                     <div class="tab active" onclick="switchTab('events')">イベント履歴</div>
-                    <div class="tab" onclick="switchTab('api')">APIキー管理</div>
                     <div class="tab" onclick="switchTab('config')">設定</div>
                     <div class="tab" onclick="switchTab('test')">テスト送信</div>
+                    <div class="tab" onclick="switchTab('users')">ユーザー管理</div>
                 </div>
                 
                 <!-- イベント履歴タブ -->
@@ -296,40 +331,27 @@
                     </table>
                 </div>
                 
-                <!-- APIキー管理タブ -->
-                <div id="apiTab" class="tab-content" style="display: none;">
-                    <h2>APIキー管理</h2>
-                    <div class="api-key-box">
-                        <span>dw_live_key_abc123xyz789</span>
-                        <span class="badge success">有効</span>
-                    </div>
-                    <div class="api-key-box">
-                        <span>dw_test_key_demo456</span>
-                        <span class="badge success">有効</span>
-                    </div>
-                    <button class="btn" style="width: 200px; margin-top: 20px;">新しいAPIキーを生成</button>
-                </div>
-                
                 <!-- 設定タブ -->
                 <div id="configTab" class="tab-content" style="display: none;">
                     <h2>システム設定</h2>
                     <div class="form-group">
                         <label>営業時間（開始）</label>
-                        <input type="number" value="9" min="0" max="23">
+                        <input type="number" id="businessHourStart" value="9" min="0" max="23">
                     </div>
                     <div class="form-group">
                         <label>営業時間（終了）</label>
-                        <input type="number" value="18" min="0" max="23">
+                        <input type="number" id="businessHourEnd" value="18" min="0" max="23">
                     </div>
                     <div class="form-group">
                         <label>デフォルトBCC（Sales）</label>
-                        <input type="email" value="sales@dandori-work.com">
+                        <input type="email" id="salesBcc" value="sales@dandori-work.com">
                     </div>
                     <div class="form-group">
                         <label>デフォルトBCC（Training）</label>
-                        <input type="email" value="training@dandori-work.com">
+                        <input type="email" id="trainingBcc" value="training@dandori-work.com">
                     </div>
-                    <button class="btn" style="width: 200px;">設定を保存</button>
+                    <button class="btn" style="width: 200px;" onclick="saveConfig()">設定を保存</button>
+                    <div class="success-message" id="configSuccess">設定を保存しました</div>
                 </div>
                 
                 <!-- テスト送信タブ -->
@@ -346,14 +368,55 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>ペイロード (JSON)</label>
-                        <textarea id="testPayload" style="width: 100%; height: 200px; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-family: monospace;">{
-  "dealId": "test_001",
-  "companyName": "テスト株式会社"
-}</textarea>
+                        <label>会社名</label>
+                        <input type="text" id="testCompanyName" value="テスト株式会社">
+                    </div>
+                    <div class="form-group">
+                        <label>担当者名</label>
+                        <input type="text" id="testContactName" value="山田太郎">
                     </div>
                     <button class="btn" style="width: 200px;" onclick="sendTestEvent()">テスト送信</button>
                     <div id="testResult" style="margin-top: 20px;"></div>
+                </div>
+                
+                <!-- ユーザー管理タブ -->
+                <div id="usersTab" class="tab-content" style="display: none;">
+                    <h2>ユーザー管理</h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ユーザーID</th>
+                                <th>名前</th>
+                                <th>権限</th>
+                                <th>最終ログイン</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>admin</td>
+                                <td>管理者</td>
+                                <td><span class="badge success">管理者</span></td>
+                                <td>2025-01-13 14:30</td>
+                                <td><button onclick="editUser('admin')">編集</button></td>
+                            </tr>
+                            <tr>
+                                <td>sales01</td>
+                                <td>営業担当A</td>
+                                <td><span class="badge pending">営業</span></td>
+                                <td>2025-01-13 10:15</td>
+                                <td><button onclick="editUser('sales01')">編集</button></td>
+                            </tr>
+                            <tr>
+                                <td>training01</td>
+                                <td>研修担当B</td>
+                                <td><span class="badge pending">研修</span></td>
+                                <td>2025-01-12 16:45</td>
+                                <td><button onclick="editUser('training01')">編集</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn" style="width: 200px; margin-top: 20px;">新規ユーザー追加</button>
                 </div>
             </div>
         </div>
@@ -363,38 +426,44 @@
         // ログイン処理
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const apiKey = document.getElementById('apiKey').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
             
             try {
-                const response = await fetch('/api/admin/verify', {
+                const response = await fetch('/api/admin/login', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-Key': apiKey
-                    }
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
                 });
                 
-                if (response.ok) {
-                    localStorage.setItem('apiKey', apiKey);
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('username', username);
                     showDashboard();
                 } else {
                     document.getElementById('loginError').style.display = 'block';
-                    document.getElementById('loginError').textContent = '無効なAPIキーです';
+                    document.getElementById('loginError').textContent = data.error || 'ログインに失敗しました';
                 }
             } catch (error) {
                 document.getElementById('loginError').style.display = 'block';
-                document.getElementById('loginError').textContent = 'ログインエラーが発生しました';
+                document.getElementById('loginError').textContent = 'サーバーエラーが発生しました';
             }
         });
         
         function showDashboard() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboard').classList.add('active');
+            document.getElementById('currentUser').textContent = localStorage.getItem('username') || 'admin';
             loadDashboardData();
         }
         
         function logout() {
-            localStorage.removeItem('apiKey');
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
             location.reload();
         }
         
@@ -413,12 +482,12 @@
         }
         
         async function loadDashboardData() {
-            const apiKey = localStorage.getItem('apiKey');
+            const token = localStorage.getItem('token');
             
             try {
                 const response = await fetch('/api/admin/stats', {
                     headers: {
-                        'X-API-Key': apiKey
+                        'Authorization': 'Bearer ' + token
                     }
                 });
                 
@@ -438,12 +507,12 @@
         }
         
         async function loadEventHistory() {
-            const apiKey = localStorage.getItem('apiKey');
+            const token = localStorage.getItem('token');
             
             try {
                 const response = await fetch('/api/admin/events', {
                     headers: {
-                        'X-API-Key': apiKey
+                        'Authorization': 'Bearer ' + token
                     }
                 });
                 
@@ -472,28 +541,33 @@
         }
         
         async function sendTestEvent() {
-            const apiKey = localStorage.getItem('apiKey');
+            const token = localStorage.getItem('token');
             const type = document.getElementById('testEventType').value;
-            const payload = JSON.parse(document.getElementById('testPayload').value);
+            const companyName = document.getElementById('testCompanyName').value;
+            const contactName = document.getElementById('testContactName').value;
             
             try {
                 const response = await fetch('/events', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-API-Key': apiKey
+                        'Authorization': 'Bearer ' + token
                     },
                     body: JSON.stringify({
                         id: 'test_' + Date.now(),
                         type: type,
-                        payload: payload
+                        payload: {
+                            dealId: 'deal_test_' + Date.now(),
+                            companyName: companyName,
+                            contactName: contactName
+                        }
                     })
                 });
                 
                 const result = await response.json();
                 document.getElementById('testResult').innerHTML = `
-                    <div class="badge ${response.ok ? 'success' : 'error'}">
-                        ${response.ok ? '送信成功' : '送信失敗'}: ${JSON.stringify(result)}
+                    <div class="badge ${response.ok ? 'success' : 'error'}" style="padding: 10px;">
+                        ${response.ok ? '✅ 送信成功' : '❌ 送信失敗'}: ${JSON.stringify(result)}
                     </div>
                 `;
                 
@@ -502,14 +576,30 @@
                 }
             } catch (error) {
                 document.getElementById('testResult').innerHTML = `
-                    <div class="badge error">エラー: ${error.message}</div>
+                    <div class="badge error" style="padding: 10px;">エラー: ${error.message}</div>
                 `;
             }
         }
         
+        function saveConfig() {
+            // 設定保存処理（デモ）
+            document.getElementById('configSuccess').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('configSuccess').style.display = 'none';
+            }, 3000);
+        }
+        
+        function editUser(userId) {
+            alert('ユーザー編集: ' + userId);
+        }
+        
+        function viewEventDetail(eventId) {
+            alert('イベント詳細: ' + eventId);
+        }
+        
         // 初期チェック
-        if (localStorage.getItem('apiKey')) {
-            // 開発用：自動ログイン
+        if (localStorage.getItem('token')) {
+            // トークンがある場合は自動ログイン
             showDashboard();
         }
     </script>

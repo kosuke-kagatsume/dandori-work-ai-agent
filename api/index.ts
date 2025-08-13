@@ -17,17 +17,47 @@ async function initialize() {
   }
 }
 
-// 簡易APIキー認証
-const VALID_API_KEYS = {
-  'dw_live_key_abc123xyz789': {
-    name: 'メインAPIキー',
+// ユーザー認証情報（デモ用）
+const USERS = {
+  'admin': {
+    password: 'dandori123',
+    name: '管理者',
+    role: 'admin',
     permissions: ['read', 'write', 'admin']
   },
-  'dw_test_key_demo456': {
-    name: 'テスト用APIキー',
+  'sales01': {
+    password: 'sales123',
+    name: '営業担当A',
+    role: 'sales',
+    permissions: ['read', 'write']
+  },
+  'training01': {
+    password: 'training123',
+    name: '研修担当B',
+    role: 'training',
     permissions: ['read', 'write']
   }
 };
+
+// 簡易トークン生成
+function generateToken(username: string): string {
+  return Buffer.from(`${username}:${Date.now()}`).toString('base64');
+}
+
+// トークン検証
+function validateToken(token: string): { valid: boolean; username?: string } {
+  try {
+    if (!token) return { valid: false };
+    const decoded = Buffer.from(token, 'base64').toString();
+    const [username] = decoded.split(':');
+    if (USERS[username as keyof typeof USERS]) {
+      return { valid: true, username };
+    }
+    return { valid: false };
+  } catch {
+    return { valid: false };
+  }
+}
 
 export default async function handler(req: any, res: any) {
   await initialize();
@@ -37,7 +67,7 @@ export default async function handler(req: any, res: any) {
   // CORS対応
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-API-Key');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
   if (method === 'OPTIONS') {
     return res.status(200).end();
@@ -52,29 +82,37 @@ export default async function handler(req: any, res: any) {
     });
   }
   
-  // 管理API - 認証確認
-  if (method === 'POST' && url.includes('/admin/verify')) {
-    const apiKey = req.headers['x-api-key'];
-    const keyInfo = VALID_API_KEYS[apiKey as keyof typeof VALID_API_KEYS];
+  // ログインエンドポイント
+  if (method === 'POST' && url.includes('/admin/login')) {
+    const { username, password } = req.body;
+    const user = USERS[username as keyof typeof USERS];
     
-    if (keyInfo && keyInfo.permissions.includes('admin')) {
-      return res.json({ 
-        success: true, 
-        name: keyInfo.name,
-        permissions: keyInfo.permissions 
+    if (user && user.password === password) {
+      const token = generateToken(username);
+      return res.json({
+        success: true,
+        token,
+        username,
+        name: user.name,
+        role: user.role,
+        permissions: user.permissions
       });
     }
     
-    return res.status(401).json({ error: '認証失敗' });
+    return res.status(401).json({ 
+      success: false,
+      error: 'ユーザーIDまたはパスワードが正しくありません' 
+    });
   }
   
   // 管理API - 統計情報
   if (method === 'GET' && url.includes('/admin/stats')) {
-    const apiKey = req.headers['x-api-key'];
-    const keyInfo = VALID_API_KEYS[apiKey as keyof typeof VALID_API_KEYS];
+    const authHeader = req.headers['authorization'];
+    const token = authHeader?.replace('Bearer ', '');
+    const validation = validateToken(token);
     
-    if (!keyInfo || !keyInfo.permissions.includes('admin')) {
-      return res.status(401).json({ error: '権限がありません' });
+    if (!validation.valid) {
+      return res.status(401).json({ error: '認証が必要です' });
     }
     
     return res.json({
@@ -87,11 +125,12 @@ export default async function handler(req: any, res: any) {
   
   // 管理API - イベント履歴
   if (method === 'GET' && url.includes('/admin/events')) {
-    const apiKey = req.headers['x-api-key'];
-    const keyInfo = VALID_API_KEYS[apiKey as keyof typeof VALID_API_KEYS];
+    const authHeader = req.headers['authorization'];
+    const token = authHeader?.replace('Bearer ', '');
+    const validation = validateToken(token);
     
-    if (!keyInfo || !keyInfo.permissions.includes('admin')) {
-      return res.status(401).json({ error: '権限がありません' });
+    if (!validation.valid) {
+      return res.status(401).json({ error: '認証が必要です' });
     }
     
     const dummyEvents = [
@@ -112,6 +151,18 @@ export default async function handler(req: any, res: any) {
         type: 'Sales.NoAnswer',
         status: 'pending',
         created_at: new Date(Date.now() - 1800000).toISOString()
+      },
+      {
+        id: 'evt_' + Math.random().toString(36).substr(2, 9),
+        type: 'Sales.QuoteReady',
+        status: 'error',
+        created_at: new Date(Date.now() - 900000).toISOString()
+      },
+      {
+        id: 'evt_' + Math.random().toString(36).substr(2, 9),
+        type: 'Training.Tminus3',
+        status: 'completed',
+        created_at: new Date(Date.now() - 450000).toISOString()
       }
     ];
     
@@ -120,21 +171,22 @@ export default async function handler(req: any, res: any) {
   
   // Webhook/イベント受信
   if (method === 'POST' && (url === '/webhook' || url === '/events')) {
-    const apiKey = req.headers['x-api-key'] || req.query.api_key;
+    const authHeader = req.headers['authorization'];
+    const token = authHeader?.replace('Bearer ', '');
     const isDevelopment = process.env.NODE_ENV === 'development' || 
                          process.env.USE_MOCK_ADAPTERS === 'true';
     
     // 開発環境では認証をスキップ可能
-    if (!isDevelopment && !apiKey) {
+    if (!isDevelopment && !token) {
       return res.status(401).json({ 
         error: '認証エラー',
-        message: 'APIキーが必要です',
+        message: 'トークンが必要です',
         documentation: 'https://dandori-ai-agent.vercel.app/admin.html'
       });
     }
     
-    if (apiKey && !VALID_API_KEYS[apiKey as keyof typeof VALID_API_KEYS]) {
-      return res.status(401).json({ error: '無効なAPIキー' });
+    if (token && !validateToken(token).valid) {
+      return res.status(401).json({ error: '無効なトークン' });
     }
     
     try {
@@ -176,9 +228,9 @@ export default async function handler(req: any, res: any) {
     error: 'エンドポイントが見つかりません',
     available: [
       'GET /health',
+      'POST /api/admin/login',
       'POST /events',
       'POST /webhook',
-      'POST /api/admin/verify',
       'GET /api/admin/stats',
       'GET /api/admin/events'
     ]
