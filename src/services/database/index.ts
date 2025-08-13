@@ -7,7 +7,8 @@ let db: Knex | null = null;
 export async function initDatabase(): Promise<Knex> {
   if (db) return db;
 
-  const dbPath = process.env.DATABASE_PATH || path.join(process.cwd(), 'data', 'dandori.db');
+  // Vercelでは/tmpディレクトリを使用
+  const dbPath = process.env.DATABASE_PATH || '/tmp/dandori.db';
   
   db = knex({
     client: 'sqlite3',

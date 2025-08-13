@@ -1,5 +1,5 @@
 import { logger } from '../lib/logger';
-import crypto from 'crypto';
+import { randomBytes } from 'crypto';
 
 export interface ApiKey {
   key: string;
@@ -58,8 +58,8 @@ export async function validateApiKey(apiKey: string | undefined): Promise<ApiKey
 }
 
 export function generateApiKey(prefix: string = 'dw_live_key'): string {
-  const randomBytes = crypto.randomBytes(24);
-  const randomString = randomBytes.toString('base64')
+  const bytes = randomBytes(24);
+  const randomString = bytes.toString('base64')
     .replace(/\+/g, '')
     .replace(/\//g, '')
     .replace(/=/g, '');
