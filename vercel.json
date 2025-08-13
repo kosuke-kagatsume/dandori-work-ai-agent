@@ -2,7 +2,7 @@
   "version": 2,
   "name": "dandori-work-ai-agent",
   "functions": {
-    "api/index.ts": {
+    "api/index.js": {
       "maxDuration": 30
     }
   },
