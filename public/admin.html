@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理画面 - Dandori Work AI Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-box {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            width: 400px;
+        }
+        
+        .login-box h2 {
+            margin-bottom: 30px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #5a67d8;
+        }
+        
+        .dashboard {
+            display: none;
+        }
+        
+        .dashboard.active {
+            display: block;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .table th {
+            background: #f9f9f9;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .api-key-box {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: monospace;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 20px;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 0;
+            cursor: pointer;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- ログイン画面 -->
+    <div class="login-container" id="loginScreen">
+        <div class="login-box">
+            <h2>🔐 管理画面ログイン</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>APIキー</label>
+                    <input type="password" id="apiKey" placeholder="dw_live_key_..." required>
+                </div>
+                <button type="submit" class="btn">ログイン</button>
+                <div class="error-message" id="loginError"></div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- ダッシュボード -->
+    <div class="dashboard" id="dashboard">
+        <header class="header">
+            <div class="header-content">
+                <h1>📊 Dandori Work 管理画面</h1>
+                <button class="btn" style="width: auto; padding: 8px 20px;" onclick="logout()">ログアウト</button>
+            </div>
+        </header>
+        
+        <div class="container">
+            <!-- 統計カード -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>本日のイベント</h3>
+                    <div class="value" id="todayEvents">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>処理済み</h3>
+                    <div class="value" id="processedEvents">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>エラー</h3>
+                    <div class="value" id="errorEvents">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>API呼び出し</h3>
+                    <div class="value" id="apiCalls">0</div>
+                </div>
+            </div>
+            
+            <!-- タブメニュー -->
+            <div class="section">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('events')">イベント履歴</div>
+                    <div class="tab" onclick="switchTab('api')">APIキー管理</div>
+                    <div class="tab" onclick="switchTab('config')">設定</div>
+                    <div class="tab" onclick="switchTab('test')">テスト送信</div>
+                </div>
+                
+                <!-- イベント履歴タブ -->
+                <div id="eventsTab" class="tab-content">
+                    <h2>最近のイベント</h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>時刻</th>
+                                <th>イベントID</th>
+                                <th>タイプ</th>
+                                <th>ステータス</th>
+                                <th>詳細</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventsTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: #999;">データを読み込み中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- APIキー管理タブ -->
+                <div id="apiTab" class="tab-content" style="display: none;">
+                    <h2>APIキー管理</h2>
+                    <div class="api-key-box">
+                        <span>dw_live_key_abc123xyz789</span>
+                        <span class="badge success">有効</span>
+                    </div>
+                    <div class="api-key-box">
+                        <span>dw_test_key_demo456</span>
+                        <span class="badge success">有効</span>
+                    </div>
+                    <button class="btn" style="width: 200px; margin-top: 20px;">新しいAPIキーを生成</button>
+                </div>
+                
+                <!-- 設定タブ -->
+                <div id="configTab" class="tab-content" style="display: none;">
+                    <h2>システム設定</h2>
+                    <div class="form-group">
+                        <label>営業時間（開始）</label>
+                        <input type="number" value="9" min="0" max="23">
+                    </div>
+                    <div class="form-group">
+                        <label>営業時間（終了）</label>
+                        <input type="number" value="18" min="0" max="23">
+                    </div>
+                    <div class="form-group">
+                        <label>デフォルトBCC（Sales）</label>
+                        <input type="email" value="sales@dandori-work.com">
+                    </div>
+                    <div class="form-group">
+                        <label>デフォルトBCC（Training）</label>
+                        <input type="email" value="training@dandori-work.com">
+                    </div>
+                    <button class="btn" style="width: 200px;">設定を保存</button>
+                </div>
+                
+                <!-- テスト送信タブ -->
+                <div id="testTab" class="tab-content" style="display: none;">
+                    <h2>イベントテスト送信</h2>
+                    <div class="form-group">
+                        <label>イベントタイプ</label>
+                        <select id="testEventType" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px;">
+                            <option value="Sales.InitialCallLogged">Sales - 初回コール記録</option>
+                            <option value="Sales.NoAnswer">Sales - 不在</option>
+                            <option value="Sales.QuoteReady">Sales - 見積準備完了</option>
+                            <option value="Training.ContractSigned">Training - 契約締結</option>
+                            <option value="Training.Tminus3">Training - 3日前リマインド</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ペイロード (JSON)</label>
+                        <textarea id="testPayload" style="width: 100%; height: 200px; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-family: monospace;">{
+  "dealId": "test_001",
+  "companyName": "テスト株式会社"
+}</textarea>
+                    </div>
+                    <button class="btn" style="width: 200px;" onclick="sendTestEvent()">テスト送信</button>
+                    <div id="testResult" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ログイン処理
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const apiKey = document.getElementById('apiKey').value;
+            
+            try {
+                const response = await fetch('/api/admin/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    }
+                });
+                
+                if (response.ok) {
+                    localStorage.setItem('apiKey', apiKey);
+                    showDashboard();
+                } else {
+                    document.getElementById('loginError').style.display = 'block';
+                    document.getElementById('loginError').textContent = '無効なAPIキーです';
+                }
+            } catch (error) {
+                document.getElementById('loginError').style.display = 'block';
+                document.getElementById('loginError').textContent = 'ログインエラーが発生しました';
+            }
+        });
+        
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').classList.add('active');
+            loadDashboardData();
+        }
+        
+        function logout() {
+            localStorage.removeItem('apiKey');
+            location.reload();
+        }
+        
+        function switchTab(tabName) {
+            // タブボタンの切り替え
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // コンテンツの切り替え
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById(tabName + 'Tab').style.display = 'block';
+        }
+        
+        async function loadDashboardData() {
+            const apiKey = localStorage.getItem('apiKey');
+            
+            try {
+                const response = await fetch('/api/admin/stats', {
+                    headers: {
+                        'X-API-Key': apiKey
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('todayEvents').textContent = data.todayEvents || 0;
+                    document.getElementById('processedEvents').textContent = data.processedEvents || 0;
+                    document.getElementById('errorEvents').textContent = data.errorEvents || 0;
+                    document.getElementById('apiCalls').textContent = data.apiCalls || 0;
+                }
+                
+                // イベント履歴の読み込み
+                loadEventHistory();
+            } catch (error) {
+                console.error('データ読み込みエラー:', error);
+            }
+        }
+        
+        async function loadEventHistory() {
+            const apiKey = localStorage.getItem('apiKey');
+            
+            try {
+                const response = await fetch('/api/admin/events', {
+                    headers: {
+                        'X-API-Key': apiKey
+                    }
+                });
+                
+                if (response.ok) {
+                    const events = await response.json();
+                    const tbody = document.getElementById('eventsTableBody');
+                    
+                    if (events.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">イベントがありません</td></tr>';
+                        return;
+                    }
+                    
+                    tbody.innerHTML = events.map(event => `
+                        <tr>
+                            <td>${new Date(event.created_at).toLocaleString('ja-JP')}</td>
+                            <td>${event.id}</td>
+                            <td>${event.type}</td>
+                            <td><span class="badge ${event.status}">${event.status}</span></td>
+                            <td><button onclick="viewEventDetail('${event.id}')">詳細</button></td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('イベント履歴読み込みエラー:', error);
+            }
+        }
+        
+        async function sendTestEvent() {
+            const apiKey = localStorage.getItem('apiKey');
+            const type = document.getElementById('testEventType').value;
+            const payload = JSON.parse(document.getElementById('testPayload').value);
+            
+            try {
+                const response = await fetch('/events', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    },
+                    body: JSON.stringify({
+                        id: 'test_' + Date.now(),
+                        type: type,
+                        payload: payload
+                    })
+                });
+                
+                const result = await response.json();
+                document.getElementById('testResult').innerHTML = `
+                    <div class="badge ${response.ok ? 'success' : 'error'}">
+                        ${response.ok ? '送信成功' : '送信失敗'}: ${JSON.stringify(result)}
+                    </div>
+                `;
+                
+                if (response.ok) {
+                    setTimeout(loadEventHistory, 1000);
+                }
+            } catch (error) {
+                document.getElementById('testResult').innerHTML = `
+                    <div class="badge error">エラー: ${error.message}</div>
+                `;
+            }
+        }
+        
+        // 初期チェック
+        if (localStorage.getItem('apiKey')) {
+            // 開発用：自動ログイン
+            showDashboard();
+        }
+    </script>
+</body>
+</html>
