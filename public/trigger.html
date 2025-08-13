@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>イベントトリガー | Dandori Work AI Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .nav-tab {
+            padding: 10px 20px;
+            background: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .content-area {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .event-template {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .event-template:hover {
+            background: #e8f4f8;
+            border-color: #667eea;
+        }
+
+        .event-template h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .event-template p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .preview-panel {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .preview-panel h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .preview-content {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .status-message.success {
+            background: #c6f6d5;
+            border: 1px solid #9ae6b4;
+            color: #22543d;
+        }
+
+        .status-message.error {
+            background: #fed7d7;
+            border: 1px solid #fc8181;
+            color: #742a2a;
+        }
+
+        .upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 5px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #cbd5e0;
+            margin-bottom: 10px;
+        }
+
+        .quick-action {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .quick-action:hover {
+            transform: translateY(-2px);
+        }
+
+        .quick-action h4 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .quick-action p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 イベントトリガー</h1>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="manual">手動トリガー</button>
+            <button class="nav-tab" data-tab="webhook">Webhook</button>
+            <button class="nav-tab" data-tab="csv">CSV一括</button>
+            <button class="nav-tab" data-tab="schedule">スケジュール</button>
+        </div>
+
+        <div class="content-area">
+            <!-- 手動トリガー -->
+            <div class="tab-content active" id="manual">
+                <div class="form-section">
+                    <h2>クイックアクション</h2>
+                    <div class="form-grid">
+                        <div class="quick-action" onclick="loadTemplate('new_lead')">
+                            <h4>🎯 新規リード登録</h4>
+                            <p>Zohoに新規リードが登録されたイベント</p>
+                        </div>
+                        <div class="quick-action" onclick="loadTemplate('initial_call')">
+                            <h4>📞 初回架電完了</h4>
+                            <p>営業担当が初回架電を完了</p>
+                        </div>
+                        <div class="quick-action" onclick="loadTemplate('contract_signed')">
+                            <h4>📝 契約締結</h4>
+                            <p>研修契約が締結されたイベント</p>
+                        </div>
+                        <div class="quick-action" onclick="loadTemplate('session_complete')">
+                            <h4>✅ 研修セッション完了</h4>
+                            <p>研修セッションが完了</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>イベント詳細</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>エージェントタイプ</label>
+                            <select id="agentType">
+                                <option value="sales">営業エージェント</option>
+                                <option value="training">研修エージェント</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>イベントタイプ</label>
+                            <select id="eventType">
+                                <option value="lead_created">リード作成</option>
+                                <option value="initial_call_completed">初回架電完了</option>
+                                <option value="demo_scheduled">デモ予約</option>
+                                <option value="proposal_sent">提案書送付</option>
+                                <option value="contract_signed">契約締結</option>
+                                <option value="session_scheduled">セッション予約</option>
+                                <option value="session_completed">セッション完了</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>イベントデータ (JSON)</label>
+                        <textarea id="eventData">{
+  "dealId": "D-2024-001",
+  "accountName": "株式会社サンプル",
+  "contactName": "山田太郎",
+  "contactEmail": "yamada@example.com",
+  "dealAmount": 500000,
+  "stage": "proposal",
+  "assignedTo": "sales01"
+}</textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="triggerEvent()">
+                            イベント発火
+                        </button>
+                        <button class="btn btn-secondary" onclick="previewEvent()">
+                            プレビュー
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearForm()">
+                            クリア
+                        </button>
+                    </div>
+
+                    <div class="preview-panel" id="previewPanel" style="display: none;">
+                        <h3>イベントプレビュー</h3>
+                        <div class="preview-content" id="previewContent"></div>
+                    </div>
+
+                    <div class="status-message" id="statusMessage"></div>
+                </div>
+            </div>
+
+            <!-- Webhook -->
+            <div class="tab-content" id="webhook">
+                <div class="form-section">
+                    <h2>Webhook設定</h2>
+                    <div class="form-group">
+                        <label>Webhook URL</label>
+                        <input type="text" id="webhookUrl" value="https://dandori-ai-agent.vercel.app/api/webhook" readonly>
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            外部サービスからこのURLにPOSTリクエストを送信してください
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>認証トークン</label>
+                        <input type="text" id="webhookToken" value="wh_token_" readonly>
+                        <button class="btn btn-secondary" onclick="generateToken()" style="margin-top: 10px;">
+                            新規トークン生成
+                        </button>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>Webhook履歴</h2>
+                        <div id="webhookHistory">
+                            <p style="color: #999;">まだWebhookを受信していません</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CSV一括 -->
+            <div class="tab-content" id="csv">
+                <div class="form-section">
+                    <h2>CSV一括インポート</h2>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📁</div>
+                        <p>CSVファイルをドラッグ＆ドロップ<br>または</p>
+                        <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                        <button class="btn btn-primary" onclick="document.getElementById('csvFile').click()">
+                            ファイルを選択
+                        </button>
+                    </div>
+
+                    <div class="form-section" style="margin-top: 20px;">
+                        <h2>CSVテンプレート</h2>
+                        <button class="btn btn-secondary" onclick="downloadTemplate('sales')">
+                            営業用テンプレート
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadTemplate('training')">
+                            研修用テンプレート
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- スケジュール -->
+            <div class="tab-content" id="schedule">
+                <div class="form-section">
+                    <h2>定期実行スケジュール</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>スケジュール名</label>
+                            <input type="text" id="scheduleName" placeholder="例: 毎朝のリードチェック">
+                        </div>
+                        <div class="form-group">
+                            <label>実行頻度</label>
+                            <select id="scheduleFrequency">
+                                <option value="daily">毎日</option>
+                                <option value="weekly">毎週</option>
+                                <option value="monthly">毎月</option>
+                                <option value="custom">カスタム</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>実行時刻</label>
+                            <input type="time" id="scheduleTime" value="09:00">
+                        </div>
+                        <div class="form-group">
+                            <label>イベントタイプ</label>
+                            <select id="scheduleEventType">
+                                <option value="check_new_leads">新規リードチェック</option>
+                                <option value="follow_up_reminder">フォローアップリマインダー</option>
+                                <option value="report_generation">レポート生成</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="saveSchedule()">
+                        スケジュール保存
+                    </button>
+
+                    <div class="form-section" style="margin-top: 30px;">
+                        <h2>登録済みスケジュール</h2>
+                        <div id="scheduleList">
+                            <p style="color: #999;">スケジュールが登録されていません</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // タブ切り替え
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                
+                // タブボタンの状態更新
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // コンテンツの表示切り替え
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+
+        // テンプレート読み込み
+        function loadTemplate(type) {
+            const templates = {
+                new_lead: {
+                    agentType: 'sales',
+                    eventType: 'lead_created',
+                    data: {
+                        leadId: 'L-' + Date.now(),
+                        companyName: '株式会社サンプル',
+                        contactName: '田中一郎',
+                        contactEmail: 'tanaka@example.com',
+                        source: 'website',
+                        interest: 'AI導入支援',
+                        budget: 3000000
+                    }
+                },
+                initial_call: {
+                    agentType: 'sales',
+                    eventType: 'initial_call_completed',
+                    data: {
+                        dealId: 'D-' + Date.now(),
+                        accountName: '株式会社テスト',
+                        callDuration: 30,
+                        callOutcome: 'interested',
+                        nextStep: 'demo_scheduled',
+                        notes: '導入に前向き。来週デモ予定。'
+                    }
+                },
+                contract_signed: {
+                    agentType: 'training',
+                    eventType: 'contract_signed',
+                    data: {
+                        contractId: 'C-' + Date.now(),
+                        programName: 'AI活用研修プログラム',
+                        startDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        sessions: 5,
+                        participants: 20,
+                        totalAmount: 1500000
+                    }
+                },
+                session_complete: {
+                    agentType: 'training',
+                    eventType: 'session_completed',
+                    data: {
+                        sessionId: 'S-' + Date.now(),
+                        programId: 'P-2024-001',
+                        sessionNumber: 3,
+                        attendees: 18,
+                        completionRate: 95,
+                        feedback: 'excellent'
+                    }
+                }
+            };
+
+            const template = templates[type];
+            if (template) {
+                document.getElementById('agentType').value = template.agentType;
+                document.getElementById('eventType').value = template.eventType;
+                document.getElementById('eventData').value = JSON.stringify(template.data, null, 2);
+                
+                showStatus('テンプレートを読み込みました', 'success');
+            }
+        }
+
+        // イベント発火
+        async function triggerEvent() {
+            const agentType = document.getElementById('agentType').value;
+            const eventType = document.getElementById('eventType').value;
+            const eventData = document.getElementById('eventData').value;
+
+            try {
+                const data = JSON.parse(eventData);
+                
+                const event = {
+                    id: 'evt_' + Date.now(),
+                    type: eventType,
+                    agent: agentType,
+                    timestamp: new Date().toISOString(),
+                    data: data
+                };
+
+                // APIに送信
+                const response = await fetch('/api/events/trigger', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(event)
+                });
+
+                if (response.ok) {
+                    showStatus('イベントを正常に発火しました！', 'success');
+                    
+                    // ローカルストレージに履歴保存
+                    const history = JSON.parse(localStorage.getItem('eventHistory') || '[]');
+                    history.unshift(event);
+                    localStorage.setItem('eventHistory', JSON.stringify(history.slice(0, 50)));
+                } else {
+                    showStatus('イベント発火に失敗しました', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('JSONフォーマットエラー: ' + error.message, 'error');
+            }
+        }
+
+        // プレビュー
+        function previewEvent() {
+            const agentType = document.getElementById('agentType').value;
+            const eventType = document.getElementById('eventType').value;
+            const eventData = document.getElementById('eventData').value;
+
+            try {
+                const data = JSON.parse(eventData);
+                
+                const event = {
+                    id: 'evt_preview',
+                    type: eventType,
+                    agent: agentType,
+                    timestamp: new Date().toISOString(),
+                    data: data
+                };
+
+                document.getElementById('previewContent').textContent = JSON.stringify(event, null, 2);
+                document.getElementById('previewPanel').style.display = 'block';
+            } catch (error) {
+                showStatus('JSONフォーマットエラー: ' + error.message, 'error');
+            }
+        }
+
+        // フォームクリア
+        function clearForm() {
+            document.getElementById('eventData').value = '{}';
+            document.getElementById('previewPanel').style.display = 'none';
+            document.getElementById('statusMessage').style.display = 'none';
+        }
+
+        // ステータス表示
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = 'status-message ' + type;
+            statusEl.style.display = 'block';
+            
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 5000);
+        }
+
+        // Webhookトークン生成
+        function generateToken() {
+            const token = 'wh_token_' + Math.random().toString(36).substring(2, 15);
+            document.getElementById('webhookToken').value = token;
+            showStatus('新しいトークンを生成しました', 'success');
+        }
+
+        // CSVテンプレートダウンロード
+        function downloadTemplate(type) {
+            const templates = {
+                sales: 'companyName,contactName,contactEmail,dealAmount,stage\n株式会社A,山田太郎,yamada@example.com,1000000,proposal\n株式会社B,鈴木花子,suzuki@example.com,2000000,negotiation',
+                training: 'programName,startDate,sessions,participants,amount\nAI基礎研修,2024-04-01,5,20,1500000\nDX推進研修,2024-05-01,3,15,900000'
+            };
+
+            const blob = new Blob([templates[type]], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `template_${type}.csv`;
+            a.click();
+        }
+
+        // CSV処理
+        document.getElementById('csvFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    // CSV処理ロジック
+                    showStatus(`${file.name}を読み込みました`, 'success');
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // ドラッグ&ドロップ
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.csv')) {
+                document.getElementById('csvFile').files = e.dataTransfer.files;
+                showStatus(`${file.name}を読み込みました`, 'success');
+            }
+        });
+
+        // スケジュール保存
+        function saveSchedule() {
+            const schedule = {
+                id: 'sch_' + Date.now(),
+                name: document.getElementById('scheduleName').value,
+                frequency: document.getElementById('scheduleFrequency').value,
+                time: document.getElementById('scheduleTime').value,
+                eventType: document.getElementById('scheduleEventType').value,
+                created: new Date().toISOString()
+            };
+
+            const schedules = JSON.parse(localStorage.getItem('schedules') || '[]');
+            schedules.push(schedule);
+            localStorage.setItem('schedules', JSON.stringify(schedules));
+
+            showStatus('スケジュールを保存しました', 'success');
+            loadSchedules();
+        }
+
+        // スケジュール一覧読み込み
+        function loadSchedules() {
+            const schedules = JSON.parse(localStorage.getItem('schedules') || '[]');
+            const listEl = document.getElementById('scheduleList');
+            
+            if (schedules.length === 0) {
+                listEl.innerHTML = '<p style="color: #999;">スケジュールが登録されていません</p>';
+            } else {
+                listEl.innerHTML = schedules.map(s => `
+                    <div class="event-template">
+                        <h3>${s.name}</h3>
+                        <p>頻度: ${s.frequency} | 時刻: ${s.time} | タイプ: ${s.eventType}</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // 初期化
+        generateToken();
+        loadSchedules();
+    </script>
+</body>
+</html>
