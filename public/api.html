@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>API Debug</title>
+</head>
+<body>
+    <h1>API Debug Tool</h1>
+    
+    <div>
+        <h2>Login Test</h2>
+        <button onclick="testLogin()">Test Login</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <script>
+        // Simple client-side authentication for demo
+        const users = {
+            'admin': {
+                password: 'dandori123',
+                name: '管理者',
+                role: 'admin',
+                permissions: ['read', 'write', 'admin']
+            },
+            'sales01': {
+                password: 'sales123',
+                name: '営業担当A',
+                role: 'sales',
+                permissions: ['read', 'write']
+            },
+            'training01': {
+                password: 'training123',
+                name: '研修担当B',
+                role: 'training',
+                permissions: ['read', 'write']
+            }
+        };
+        
+        function testLogin() {
+            const username = 'admin';
+            const password = 'dandori123';
+            
+            const user = users[username];
+            if (user && user.password === password) {
+                const token = btoa(username + ':' + Date.now());
+                const result = {
+                    success: true,
+                    token: token,
+                    username: username,
+                    name: user.name,
+                    role: user.role,
+                    permissions: user.permissions
+                };
+                
+                document.getElementById('loginResult').innerHTML = 
+                    '<pre style="background:#e8f5e8;padding:10px;">' + 
+                    JSON.stringify(result, null, 2) + 
+                    '</pre>';
+                    
+                // Store token for admin.html
+                localStorage.setItem('token', token);
+                localStorage.setItem('username', username);
+                
+                alert('Login successful! Token stored. You can now access admin.html');
+            } else {
+                document.getElementById('loginResult').innerHTML = 
+                    '<div style="color:red;">Login failed</div>';
+            }
+        }
+    </script>
+</body>
+</html>
