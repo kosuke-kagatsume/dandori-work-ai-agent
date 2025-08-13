@@ -7,9 +7,9 @@
     }
   },
   "rewrites": [
+    { "source": "/api/:path*", "destination": "/api" },
     { "source": "/health", "destination": "/api" },
     { "source": "/webhook", "destination": "/api" },
-    { "source": "/events", "destination": "/api" },
-    { "source": "/(.*)", "destination": "/api" }
+    { "source": "/events", "destination": "/api" }
   ]
 }
