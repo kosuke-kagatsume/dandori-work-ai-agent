@@ -3,7 +3,6 @@
   "version": "1.0.0-mvp",
   "description": "Dandori Work AI Agent System for Sales and Training",
   "main": "dist/index.js",
-  "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
