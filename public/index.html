@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dandori Work AI Agent</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 90%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .status {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .endpoints {
+            margin-top: 30px;
+        }
+        .endpoint {
+            background: #f8fafc;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #10b981;
+            color: white;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Dandori Work AI Agent</h1>
+        <div class="status">
+            <strong>Status:</strong> System Operational <span class="badge">ACTIVE</span>
+        </div>
+        
+        <p>AI-powered automation system for Sales and Training workflows.</p>
+        
+        <div class="endpoints">
+            <h3>Available Endpoints:</h3>
+            <div class="endpoint">
+                GET /health <span class="badge">Health Check</span>
+            </div>
+            <div class="endpoint">
+                POST /webhook <span class="badge">Webhook Receiver</span>
+            </div>
+            <div class="endpoint">
+                POST /events <span class="badge">Event Trigger</span>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <p style="color: #6b7280; font-size: 14px;">
+                Version: 1.0.0-MVP | Environment: Production
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Health check
+        fetch('/health')
+            .then(res => res.json())
+            .then(data => console.log('Health check:', data))
+            .catch(err => console.error('Health check failed:', err));
+    </script>
+</body>
+</html>
