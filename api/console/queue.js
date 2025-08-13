@@ -1,6 +1,4 @@
 // Vercel Function: Queue API
-const killSwitches = new Map();
-
 module.exports = (req, res) => {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');

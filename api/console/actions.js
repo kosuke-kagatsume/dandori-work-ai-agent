@@ -1,6 +1,4 @@
 // Vercel Function: Console Actions API
-const processedKeys = new Set();
-
 module.exports = (req, res) => {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,11 +14,6 @@ module.exports = (req, res) => {
   }
   
   const idempotencyKey = req.headers['idempotency-key'];
-  
-  // Idempotency check
-  if (idempotencyKey && processedKeys.has(idempotencyKey)) {
-    return res.status(200).json({ ok: true, cached: true });
-  }
   
   const { action } = req.query;
   const body = req.body || {};
@@ -70,10 +63,6 @@ module.exports = (req, res) => {
         automationEnabled: body.enabled
       };
       break;
-  }
-  
-  if (idempotencyKey && response.ok) {
-    processedKeys.add(idempotencyKey);
   }
   
   return res.status(200).json(response);
