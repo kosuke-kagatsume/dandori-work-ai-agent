@@ -7,6 +7,9 @@
     },
     "api/admin/*.js": {
       "maxDuration": 30
+    },
+    "api/console/*.js": {
+      "maxDuration": 30
     }
   }
 }
