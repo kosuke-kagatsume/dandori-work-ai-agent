@@ -1,12 +1,12 @@
-import { Event, Deal, EmailDraft } from '../domain/models.js';
-import { logger } from '../lib/logger.js';
-import { emailService } from '../services/adapters/email.js';
-import { smsService } from '../services/adapters/sms.js';
-import { zohoService } from '../services/adapters/zoho.js';
-import { storageService } from '../services/storage/drive.js';
-import { templateService } from '../services/templating/render.js';
-import { schedulerService } from '../services/scheduler/scheduler.js';
-import { getConfig } from '../config/loadConfig.js';
+import { Event, Deal, EmailDraft } from '../domain/models';
+import { logger } from '../lib/logger';
+import { emailService } from '../services/adapters/email';
+import { smsService } from '../services/adapters/sms';
+import { zohoService } from '../services/adapters/zoho';
+import { storageService } from '../services/storage/drive';
+import { templateService } from '../services/templating/render';
+import { schedulerService } from '../services/scheduler/scheduler';
+import { getConfig } from '../config/loadConfig';
 
 class SalesFlow {
   async process(event: Event): Promise<void> {

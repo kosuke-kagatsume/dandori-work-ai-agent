@@ -1,7 +1,7 @@
 import Handlebars from 'handlebars';
 import * as fs from 'fs';
 import * as path from 'path';
-import { logger } from '../../lib/logger.js';
+import { logger } from '../../lib/logger';
 
 class TemplateService {
   private templates = new Map<string, HandlebarsTemplateDelegate>();

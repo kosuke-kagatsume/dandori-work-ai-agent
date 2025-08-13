@@ -2,7 +2,7 @@ import { z } from 'zod';
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
 import * as path from 'path';
-import { logger } from '../lib/logger.js';
+import { logger } from '../lib/logger';
 
 const QuietHoursSchema = z.object({
   startHour: z.number().min(0).max(23),

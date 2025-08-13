@@ -1,6 +1,6 @@
-import { QuietHours, EmailDraft } from '../../domain/models.js';
-import { logger } from '../../lib/logger.js';
-import { getConfig } from '../../config/loadConfig.js';
+import { QuietHours, EmailDraft } from '../../domain/models';
+import { logger } from '../../lib/logger';
+import { getConfig } from '../../config/loadConfig';
 import * as cron from 'node-cron';
 
 class SchedulerService {

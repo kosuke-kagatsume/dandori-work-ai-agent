@@ -1,5 +1,5 @@
-import { Deal } from '../../domain/models.js';
-import { logger } from '../../lib/logger.js';
+import { Deal } from '../../domain/models';
+import { logger } from '../../lib/logger';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface ZohoAdapter {

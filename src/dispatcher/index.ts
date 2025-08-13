@@ -1,7 +1,7 @@
-import { logger } from '../lib/logger.js';
-import { salesFlow } from '../flows/sales.js';
-import { trainingFlow } from '../flows/training.js';
-import { Event } from '../domain/models.js';
+import { logger } from '../lib/logger';
+import { salesFlow } from '../flows/sales';
+import { trainingFlow } from '../flows/training';
+import { Event } from '../domain/models';
 
 class Dispatcher {
   private processedEvents = new Map<string, Date>();

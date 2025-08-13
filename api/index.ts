@@ -1,8 +1,8 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import { logger } from '../src/lib/logger.js';
-import { dispatcher } from '../src/dispatcher/index.js';
-import { loadConfig } from '../src/config/loadConfig.js';
+import { logger } from '../src/lib/logger';
+import { dispatcher } from '../src/dispatcher/index';
+import { loadConfig } from '../src/config/loadConfig';
 
 dotenv.config();
 

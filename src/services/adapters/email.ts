@@ -1,6 +1,6 @@
-import { EmailDraft } from '../../domain/models.js';
-import { logger } from '../../lib/logger.js';
-import { emailMock } from '../mocks/email.mock.js';
+import { EmailDraft } from '../../domain/models';
+import { logger } from '../../lib/logger';
+import { emailMock } from '../mocks/email.mock';
 
 export interface EmailAdapter {
   draft(input: EmailDraft): Promise<{ draftId: string }>;

@@ -1,11 +1,11 @@
-import { Event, TrainingProgram, Session, EmailDraft } from '../domain/models.js';
-import { logger } from '../lib/logger.js';
-import { emailService } from '../services/adapters/email.js';
-import { calendarService } from '../services/adapters/calendar.js';
-import { chatworkService } from '../services/adapters/chatwork.js';
-import { templateService } from '../services/templating/render.js';
-import { schedulerService } from '../services/scheduler/scheduler.js';
-import { getConfig } from '../config/loadConfig.js';
+import { Event, TrainingProgram, Session, EmailDraft } from '../domain/models';
+import { logger } from '../lib/logger';
+import { emailService } from '../services/adapters/email';
+import { calendarService } from '../services/adapters/calendar';
+import { chatworkService } from '../services/adapters/chatwork';
+import { templateService } from '../services/templating/render';
+import { schedulerService } from '../services/scheduler/scheduler';
+import { getConfig } from '../config/loadConfig';
 
 class TrainingFlow {
   async process(event: Event): Promise<void> {

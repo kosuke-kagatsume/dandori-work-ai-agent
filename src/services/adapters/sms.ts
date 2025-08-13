@@ -1,4 +1,4 @@
-import { logger } from '../../lib/logger.js';
+import { logger } from '../../lib/logger';
 
 export interface SmsAdapter {
   send(input: { to: string; body: string }): Promise<{ messageId: string }>;
